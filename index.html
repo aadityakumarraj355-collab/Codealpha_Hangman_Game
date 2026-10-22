@@ -2,730 +2,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b1226">
-  <title>Codealpha Hangman Game | AADITYA KUMAR</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --bg: #0b1226;
-      --panel: rgba(255, 255, 255, .055);
-      --border: rgba(119, 163, 255, .22);
-      --text: #f4f7ff;
-      --muted: #b3c5e8;
-      --accent: #65c5ff;
-      --teal: #19b99b;
-    }
-
-    body {
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(ellipse at 15% 0%, #1e3c75 0, transparent 42%),
-        radial-gradient(ellipse at 90% 80%, #1b3265 0, transparent 38%),
-        var(--bg);
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-    }
-
-    button {
-      font: inherit;
-      cursor: pointer;
-    }
-
-    .container {
-      width: min(1240px, calc(100% - 32px));
-      margin: auto;
-      padding: 30px 0 24px;
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .brand {
-      font-size: clamp(26px, 4vw, 42px);
-      font-weight: 800;
-      letter-spacing: -.8px;
-    }
-
-    .brand span {
-      color: var(--accent);
-    }
-
-    .subtitle {
-      color: var(--muted);
-      margin-top: 8px;
-      font-size: 17px;
-    }
-
-    /* Student academic details */
-    .student-details {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
-      padding: 20px;
-      background: rgba(30, 55, 103, .65);
-      border: 1px solid rgba(119, 163, 255, .35);
-      border-radius: 20px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, .15);
-    }
-
-    .student-details h2 {
-      grid-column: 1 / -1;
-      color: var(--accent);
-      font-size: 22px;
-      margin-bottom: 5px;
-    }
-
-    .detail-card {
-      min-width: 0;
-      padding: 17px;
-      background: rgba(255, 255, 255, .07);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-    }
-
-    .detail-card span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 9px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .detail-card h3 {
-      color: #fff;
-      font-size: 16px;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
-
-    /* Main game layout */
-    .game-shell {
-      display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(280px, .9fr);
-      gap: 20px;
-      padding: 20px;
-      background: rgba(30, 55, 103, .48);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
-    }
-
-    .play-panel,
-    .info-panel {
-      min-width: 0;
-      border: 1px solid var(--border);
-      border-radius: 19px;
-      background: rgba(4, 15, 39, .52);
-      padding: 20px;
-    }
-
-    .play-top {
-      display: grid;
-      grid-template-columns: minmax(180px, .8fr) minmax(0, 1.2fr);
-      align-items: center;
-      gap: 24px;
-    }
-
-    /* Hangman illustration */
-    .gallows-box {
-      height: 260px;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(100, 150, 255, .06);
-    }
-
-    #hangman {
-      width: 100%;
-      height: 100%;
-      max-width: 270px;
-    }
-
-    .gallows {
-      stroke: #f4f7ff;
-      stroke-width: 6;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .person {
-      stroke: #f4f7ff;
-      stroke-width: 5;
-      fill: none;
-      stroke-linecap: round;
-    }
-
-    .game-title {
-      font-size: 24px;
-      margin-bottom: 22px;
-    }
-
-    .word {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-      margin-bottom: 26px;
-      min-height: 34px;
-    }
-
-    .letter-slot {
-      min-width: 26px;
-      text-align: center;
-      border-bottom: 4px solid #f4f7ff;
-      padding: 0 3px 5px;
-      font-size: 27px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .guessed-title {
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .guessed-box {
-      min-height: 62px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(100, 150, 255, .06);
-    }
-
-    .chip {
-      padding: 7px 11px;
-      border-radius: 9px;
-      background: #24366e;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    /* Letter keyboard */
-    .keyboard {
-      display: grid;
-      grid-template-columns: repeat(10, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 26px;
-      padding: 12px;
-      border-radius: 16px;
-      background: rgba(100, 150, 255, .06);
-    }
-
-    .key {
-      min-height: 52px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: #f7f9ff;
-      background: #1a2c52;
-      font-weight: 750;
-      font-size: 18px;
-      transition: transform .15s, background .15s;
-    }
-
-    .key:hover:not(:disabled) {
-      transform: translateY(-2px);
-      background: #2b477e;
-    }
-
-    .key:disabled {
-      opacity: .42;
-      cursor: not-allowed;
-    }
-
-    .key.correct {
-      background: var(--teal);
-      border-color: var(--teal);
-      opacity: 1;
-    }
-
-    .key.wrong {
-      background: #73354b;
-      border-color: #a14a65;
-      opacity: .8;
-    }
-
-    /* Game information */
-    .info-title {
-      font-size: 22px;
-      margin-bottom: 18px;
-    }
-
-    .info-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 17px 0;
-      border-top: 1px solid rgba(119, 163, 255, .13);
-    }
-
-    .info-label {
-      color: var(--muted);
-    }
-
-    .info-value {
-      font-size: 23px;
-      font-weight: 800;
-    }
-
-    .status {
-      color: var(--accent);
-      font-size: 16px;
-      text-align: right;
-    }
-
-    .instructions {
-      margin-top: 22px;
-      padding: 20px;
-      background: rgba(43, 77, 143, .35);
-      border-radius: 16px;
-    }
-
-    .instructions h3 {
-      margin-bottom: 12px;
-      font-size: 18px;
-    }
-
-    .instructions ol {
-      padding-left: 22px;
-      color: #dce7ff;
-      line-height: 1.65;
-    }
-
-    .instructions li + li {
-      margin-top: 8px;
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .action {
-      padding: 11px 16px;
-      border: 0;
-      border-radius: 10px;
-      font-weight: 750;
-      color: #07162d;
-      background: #a9c8ff;
-    }
-
-    .action.secondary {
-      color: var(--text);
-      background: #263b66;
-      border: 1px solid var(--border);
-    }
-
-    .result {
-      min-height: 24px;
-      margin-top: 14px;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1.5;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      margin-top: 26px;
-      line-height: 1.8;
-      font-size: 13px;
-    }
-
-    /* Responsive design */
-    @media (max-width: 850px) {
-      .game-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .keyboard {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-      }
-
-      .key {
-        min-height: 48px;
-      }
-    }
-
-    @media (max-width: 650px) {
-      .student-details {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 520px) {
-      .container {
-        width: calc(100% - 20px);
-        padding-top: 22px;
-      }
-
-      .game-shell {
-        padding: 10px;
-        gap: 12px;
-      }
-
-      .play-panel,
-      .info-panel {
-        padding: 13px;
-      }
-
-      .play-top {
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-
-      .gallows-box {
-        height: 210px;
-      }
-
-      .keyboard {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 6px;
-        padding: 8px;
-      }
-
-      .key {
-        min-height: 42px;
-        font-size: 16px;
-      }
-
-      .game-title {
-        margin-bottom: 15px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        transition: none !important;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeAlpha Hangman Game</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef2ff;
+  color: #172554;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.container {
+  width: 100%;
+  max-width: 700px;
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 12px 35px #1e293b20;
+  text-align: center;
+}
+.student {
+  background: #eff6ff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 22px;
+  text-align: left;
+  line-height: 1.8;
+}
+h1 { color: #1d4ed8; margin-bottom: 8px; }
+.subtitle { color: #64748b; }
+#drawing {
+  width: 190px;
+  height: 210px;
+  margin: 12px auto;
+}
+g.part { display: none; }
+.word {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 22px 0;
+}
+.letter {
+  width: 34px;
+  height: 42px;
+  border-bottom: 3px solid #2563eb;
+  font-size: 25px;
+  font-weight: bold;
+}
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  margin: 20px 0;
+}
+.keyboard button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-weight: bold;
+  cursor: pointer;
+}
+.keyboard button:hover:not(:disabled) { background: #93c5fd; }
+.keyboard button:disabled { opacity: .4; cursor: not-allowed; }
+#message { min-height: 28px; font-weight: bold; }
+.actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.actions button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#newGame { background: #2563eb; color: white; }
+#hint { background: #e0e7ff; color: #3730a3; }
+footer { margin-top: 24px; color: #64748b; font-size: 13px; }
+</style>
 </head>
-
 <body>
-  <main class="container">
+<main class="container">
+  <section class="student">
+    <strong>Student Name:</strong> AADITYA KUMAR<br>
+    <strong>Course:</strong> B.TECH (CSE)<br>
+    <strong>College:</strong> IIMT COLLEGE OF ENGINEERING<br>
+    <strong>Project:</strong> CodeAlpha Hangman Game
+  </section>
 
-    <!-- Student academic details -->
-    <section class="student-details" aria-labelledby="studentHeading">
-      <h2 id="studentHeading">🎓 Student Academic Details</h2>
+  <h1>Hangman Game</h1>
+  <p class="subtitle">Guess the hidden word, one letter at a time!</p>
 
-      <div class="detail-card">
-        <span>Student Name</span>
-        <h3>AADITYA KUMAR</h3>
-      </div>
+  <svg id="drawing" viewBox="0 0 190 210" aria-label="Hangman drawing">
+    <g fill="none" stroke="#334155" stroke-width="5" stroke-linecap="round">
+      <path d="M20 195 H150 M55 195 V15 H130 V38"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4">
+      <circle cx="130" cy="55" r="17"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+      <path d="M130 72 V125"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+      <path d="M130 85 L105 108"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+      <path d="M130 85 L155 108"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+      <path d="M130 125 L108 158"/>
+    </g>
+    <g class="part" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round">
+      <path d="M130 125 L152 158"/>
+    </g>
+  </svg>
 
-      <div class="detail-card">
-        <span>Course</span>
-        <h3>B.TECH (CSE)</h3>
-      </div>
+  <p>Attempts remaining: <strong id="attempts">6</strong> / 6</p>
+  <div class="word" id="word"></div>
+  <div class="keyboard" id="keyboard"></div>
+  <p id="message" aria-live="polite">Choose a letter to begin.</p>
 
-      <div class="detail-card">
-        <span>College Name</span>
-        <h3>IIMT COLLEGE OF ENGINEERING</h3>
-      </div>
-    </section>
+  <div class="actions">
+    <button id="hint">Show Hint</button>
+    <button id="newGame">New Game</button>
+  </div>
+  <p id="hintText"></p>
 
-    <!-- Game heading -->
-    <header class="header">
-      <div class="brand">
-        ♙ Codealpha_Hangman_<span>Game</span>
-      </div>
-      <p class="subtitle">Guess the word letter by letter</p>
-    </header>
+  <footer>CodeAlpha Project | Developed by AADITYA KUMAR</footer>
+</main>
 
-    <section class="game-shell">
+<script>
+const words = [
+  { word: "apple", hint: "A fruit that can be red or green." },
+  { word: "mango", hint: "A tropical fruit often called the king of fruits." },
+  { word: "kitten", hint: "A young cat." },
+  { word: "penguin", hint: "A flightless bird that swims." },
+  { word: "elephant", hint: "A very large animal with a trunk." },
+  { word: "computer", hint: "An electronic device used for computing." },
+  { word: "javascript", hint: "A programming language used on websites." },
+  { word: "college", hint: "An institution for higher education." }
+];
 
-      <!-- Main game panel -->
-      <div class="play-panel">
+let answer = "";
+let guessed = [];
+let remaining = 6;
+let finished = false;
+let currentHint = "";
 
-        <div class="play-top">
+const wordEl = document.getElementById("word");
+const keyboardEl = document.getElementById("keyboard");
+const attemptsEl = document.getElementById("attempts");
+const messageEl = document.getElementById("message");
+const hintTextEl = document.getElementById("hintText");
+const parts = document.querySelectorAll("#drawing .part");
 
-          <div class="gallows-box">
-            <svg id="hangman"
-                 viewBox="0 0 220 250"
-                 role="img"
-                 aria-label="Hangman drawing">
-              <g class="gallows">
-                <path d="M25 225 H190 M45 225 V25 H155 V45"></path>
-              </g>
-              <g id="person" class="person"></g>
-            </svg>
-          </div>
+function newGame() {
+  const entry = words[Math.floor(Math.random() * words.length)];
+  answer = entry.word;
+  currentHint = entry.hint;
+  guessed = [];
+  remaining = 6;
+  finished = false;
+  messageEl.textContent = "Choose a letter to begin.";
+  hintTextEl.textContent = "";
+  render();
+}
 
-          <div>
-            <h1 class="game-title">Guess the word</h1>
+function render() {
+  wordEl.innerHTML = "";
+  for (const letter of answer) {
+    const span = document.createElement("span");
+    span.className = "letter";
+    span.textContent = guessed.includes(letter) || finished ? letter : "";
+    wordEl.appendChild(span);
+  }
 
-            <div class="word" id="word" aria-label="Hidden word"></div>
+  keyboardEl.innerHTML = "";
+  for (let code = 65; code <= 90; code++) {
+    const letter = String.fromCharCode(code).toLowerCase();
+    const button = document.createElement("button");
+    button.textContent = letter.toUpperCase();
+    button.disabled = guessed.includes(letter) || finished;
+    button.setAttribute("aria-label", letter);
+    button.addEventListener("click", () => guess(letter));
+    keyboardEl.appendChild(button);
+  }
 
-            <p class="guessed-title">Guessed letters:</p>
+  attemptsEl.textContent = remaining;
+  parts.forEach((part, index) => {
+    part.style.display = index < 6 - remaining ? "block" : "none";
+  });
+}
 
-            <div class="guessed-box" id="guessed" aria-live="polite">
-              <span class="info-label">No letters yet</span>
-            </div>
-          </div>
+function guess(letter) {
+  if (finished || guessed.includes(letter)) return;
 
-        </div>
+  guessed.push(letter);
 
-        <div class="keyboard" id="keyboard" aria-label="Letter keyboard"></div>
+  if (!answer.includes(letter)) {
+    remaining--;
+    messageEl.textContent = "Not quite! Try another letter.";
+  } else {
+    messageEl.textContent = "Good guess!";
+  }
 
-        <p class="result" id="result" aria-live="polite"></p>
+  if ([...answer].every(char => guessed.includes(char))) {
+    finished = true;
+    messageEl.textContent = "🎉 You won! The word was " + answer + ".";
+  } else if (remaining === 0) {
+    finished = true;
+    messageEl.textContent = "Game over! The word was " + answer + ".";
+  }
 
-        <div class="controls">
-          <button class="action" id="newGame" type="button">New Game</button>
-          <button class="action secondary" id="hintButton" type="button">Hint</button>
-        </div>
-      </div>
+  render();
+}
 
-      <!-- Game information panel -->
-      <aside class="info-panel">
-        <h2 class="info-title">🎮 Game Info</h2>
+document.addEventListener("keydown", event => {
+  const key = event.key.toLowerCase();
+  if (/^[a-z]$/.test(key)) guess(key);
+});
 
-        <div class="info-row">
-          <span class="info-label">◎ &nbsp; Attempts Left</span>
-          <strong class="info-value" id="attempts">6</strong>
-        </div>
+document.getElementById("hint").addEventListener("click", () => {
+  if (!finished) hintTextEl.textContent = "Hint: " + currentHint;
+});
 
-        <div class="info-row">
-          <span class="info-label">▤ &nbsp; Word Length</span>
-          <strong class="info-value" id="length">—</strong>
-        </div>
+document.getElementById("newGame").addEventListener("click", newGame);
 
-        <div class="info-row">
-          <span class="info-label">● &nbsp; Status</span>
-          <strong class="status" id="status">In Progress</strong>
-        </div>
-
-        <div class="instructions">
-          <h3>💡 Instructions</h3>
-          <ol>
-            <li>Guess a letter by clicking a letter button or using your keyboard.</li>
-            <li>If the letter is in the word, it will appear in the blanks.</li>
-            <li>If the letter is not in the word, you lose one attempt.</li>
-            <li>Guess the word before you run out of attempts.</li>
-          </ol>
-        </div>
-      </aside>
-
-    </section>
-
-    <footer>
-      <p>Codealpha Hangman Game</p>
-      <p>Developed by AADITYA KUMAR</p>
-      <p>B.TECH (CSE) | IIMT COLLEGE OF ENGINEERING</p>
-      <p>— Good Luck! —</p>
-    </footer>
-
-  </main>
-
-  <script>
-    // Word list and hints
-    const words = [
-      { word: "apple", hint: "A fruit that can be red or green." },
-      { word: "mango", hint: "A tropical fruit known as the king of fruits." },
-      { word: "kitten", hint: "A young cat." },
-      { word: "penguin", hint: "A flightless bird that swims." },
-      { word: "elephant", hint: "A large animal with a trunk." },
-      { word: "computer", hint: "An electronic device used for programming." },
-      { word: "javascript", hint: "A programming language used on the web." },
-      { word: "rainbow", hint: "A colorful arc seen in the sky." },
-      { word: "library", hint: "A place where you can borrow books." },
-      { word: "ocean", hint: "A vast body of salt water." }
-    ];
-
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    // Body parts drawn after incorrect guesses
-    const parts = [
-      '<circle cx="155" cy="65" r="19"></circle>',
-      '<path d="M155 84 V145"></path>',
-      '<path d="M155 100 L126 124"></path>',
-      '<path d="M155 100 L184 124"></path>',
-      '<path d="M155 145 L130 183"></path>',
-      '<path d="M155 145 L180 183"></path>'
-    ];
-
-    let answer = "";
-    let hintText = "";
-    let guessed = new Set();
-    let attempts = 6;
-    let finished = false;
-
-    const wordEl = document.getElementById("word");
-    const guessedEl = document.getElementById("guessed");
-    const keyboardEl = document.getElementById("keyboard");
-    const personEl = document.getElementById("person");
-    const resultEl = document.getElementById("result");
-
-    // Start a new round
-    function startGame() {
-      const choice = words[Math.floor(Math.random() * words.length)];
-
-      answer = choice.word;
-      hintText = choice.hint;
-      guessed = new Set();
-      attempts = 6;
-      finished = false;
-
-      resultEl.textContent = "";
-      document.getElementById("hintButton").textContent = "Hint";
-      document.getElementById("length").textContent = answer.length;
-      document.getElementById("status").textContent = "In Progress";
-
-      render();
-    }
-
-    // Handle a letter guess
-    function guessLetter(letter) {
-      if (finished || guessed.has(letter)) {
-        return;
-      }
-
-      guessed.add(letter);
-
-      if (!answer.includes(letter.toLowerCase())) {
-        attempts--;
-      }
-
-      const won = [...answer].every(char =>
-        guessed.has(char.toUpperCase())
-      );
-
-      if (won) {
-        finished = true;
-        document.getElementById("status").textContent = "You Won!";
-        resultEl.textContent =
-          "🎉 Excellent! You guessed the word: " +
-          answer.toUpperCase();
-      } else if (attempts <= 0) {
-        attempts = 0;
-        finished = true;
-        document.getElementById("status").textContent = "Game Over";
-        resultEl.textContent =
-          "The word was " + answer.toUpperCase() +
-          ". Try again!";
-      }
-
-      render();
-    }
-
-    // Update all game UI elements
-    function render() {
-      // Render hidden word
-      wordEl.replaceChildren();
-
-      for (const char of answer) {
-        const slot = document.createElement("span");
-        slot.className = "letter-slot";
-
-        slot.textContent =
-          (guessed.has(char.toUpperCase()) || finished)
-            ? char
-            : "\u00a0";
-
-        wordEl.appendChild(slot);
-      }
-
-      // Render guessed letters
-      guessedEl.replaceChildren();
-
-      if (guessed.size === 0) {
-        const empty = document.createElement("span");
-        empty.className = "info-label";
-        empty.textContent = "No letters yet";
-        guessedEl.appendChild(empty);
-      } else {
-        [...guessed].sort().forEach(letter => {
-          const chip = document.createElement("span");
-          chip.className = "chip";
-          chip.textContent = letter;
-          guessedEl.appendChild(chip);
-        });
-      }
-
-      // Render A-Z keyboard
-      keyboardEl.replaceChildren();
-
-      for (const letter of alphabet) {
-        const key = document.createElement("button");
-        key.className = "key";
-        key.type = "button";
-        key.textContent = letter;
-        key.disabled = guessed.has(letter) || finished;
-        key.setAttribute("aria-label", "Guess " + letter);
-
-        if (guessed.has(letter)) {
-          key.classList.add(
-            answer.includes(letter.toLowerCase())
-              ? "correct"
-              : "wrong"
-          );
-        }
-
-        key.addEventListener("click", () => guessLetter(letter));
-        keyboardEl.appendChild(key);
-      }
-
-      // Update statistics
-      document.getElementById("attempts").textContent = attempts;
-
-      document.getElementById("status").textContent =
-        finished
-          ? (attempts > 0 ? "You Won!" : "Game Over")
-          : "In Progress";
-
-      // Draw the body parts based on incorrect guesses
-      personEl.innerHTML = parts.slice(0, 6 - attempts).join("");
-    }
-
-    // New Game
-    document.getElementById("newGame").addEventListener("click", startGame);
-
-    // Hint button
-    document.getElementById("hintButton").addEventListener("click", () => {
-      if (finished) {
-        resultEl.textContent = "Start a new game to use another hint.";
-        return;
-      }
-
-      resultEl.textContent = "Hint: " + hintText;
-      document.getElementById("hintButton").textContent = "Hint Shown";
-    });
-
-    // Support physical keyboard input
-    document.addEventListener("keydown", event => {
-      if (
-        /^[a-z]$/i.test(event.key) &&
-        !event.ctrlKey &&
-        !event.altKey &&
-        !event.metaKey
-      ) {
-        guessLetter(event.key.toUpperCase());
-      }
-    });
-
-    // Start the first round automatically
-    startGame();
-  </script>
+newGame();
+</script>
 </body>
 </html>
